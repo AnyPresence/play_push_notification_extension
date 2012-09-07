@@ -19,6 +19,7 @@ import com.google.code.morphia.annotations.Reference;
 public class Channel {
 
 	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
+	static { DS.ensureIndex(Channel.class, "channels_name_index", "name", true, false); }
 
 	@Id
 	public ObjectId id;

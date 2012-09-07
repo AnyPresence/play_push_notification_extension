@@ -44,6 +44,7 @@ public class Device {
 	}
 
 	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
+	static { DS.ensureIndex(Device.class, "devices_token_type_index", "token, type", true, false); }
 
 	@Id
 	public ObjectId id;
