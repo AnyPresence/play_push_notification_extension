@@ -1,4 +1,4 @@
-package models.push;
+package models.push.provider;
 
 import java.util.List;
 

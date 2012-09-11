@@ -9,4 +9,4 @@ dist
 .project
 .settings
 .target
-
+*.p12

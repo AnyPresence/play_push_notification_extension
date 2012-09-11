@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
-import models.push.PushNotificationProvider;
 import models.push.notification.BasicPushNotification;
 import models.push.notification.PushNotification;
 

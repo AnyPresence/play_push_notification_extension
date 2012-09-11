@@ -11,7 +11,6 @@ import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
 import javapns.communication.exceptions.KeystoreException;
 import javapns.notification.PushNotificationPayload;
-import models.push.PushNotificationProvider;
 import models.push.notification.ApnsPushNotification;
 import models.push.notification.PushNotification;
 

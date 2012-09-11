@@ -3,12 +3,14 @@ package models.push;
 import models.push.notification.PushNotification;
 import models.push.provider.ApnsPushNotificationProvider;
 import models.push.provider.GcmPushNotificationProvider;
+import models.push.provider.PushNotificationProvider;
+import plugin.push.PushNotificationExtensionPlugin;
 
 public enum DeviceType {
 	
 	
-	android(new GcmPushNotificationProvider(PushNotificationConstants.GCM_URL, PushNotificationConstants.GCM_API_KEY)), 
-	ios(new ApnsPushNotificationProvider(PushNotificationConstants.APNS_KEYSTORE_FILE, PushNotificationConstants.APNS_KEYSTORE_PASSWORD));
+	android(new GcmPushNotificationProvider(PushNotificationExtensionPlugin.getPlugin().getGcmUrl(), PushNotificationExtensionPlugin.getPlugin().getGcmApiKey())), 
+	ios(new ApnsPushNotificationProvider(PushNotificationExtensionPlugin.getPlugin().getAppleCert(), PushNotificationExtensionPlugin.getPlugin().getAppleCertPassword()));
 	
 	private PushNotificationProvider<? extends PushNotification> pushNotificationProvider;
 	

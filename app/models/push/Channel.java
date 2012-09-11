@@ -9,12 +9,13 @@ import java.util.Set;
 
 import models.push.notification.PushNotification;
 import models.push.provider.PushNotificationException;
-import morphia.MorphiaBootstrapPlugin;
+import models.push.provider.PushNotificationProvider;
 
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.JsonNode;
 
 import play.Logger;
+import plugin.morphia.MorphiaBootstrapPlugin;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Key;
@@ -23,52 +24,19 @@ import com.google.code.morphia.annotations.Id;
 import com.google.code.morphia.annotations.Reference;
 
 @Entity(value = "channels")
-public class Channel {
+public class Channel extends BaseEntity {
 
 	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
 	static { DS.ensureIndex(Channel.class, "channels_name_index", "name", true, false); }
 
 	@Id
 	public ObjectId id;
-
 	public String name;
-
 	@Reference
 	public Set<Device> devices = new HashSet<Device>();
 
 	public Channel() {
 
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Channel other = (Channel) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
 	}
 
 	public Channel(String name) {
@@ -87,11 +55,6 @@ public class Channel {
 
 	public static Channel findByName(String name) {
 		return DS.createQuery(Channel.class).filter("name", name).get();
-	}
-
-	@Override
-	public String toString() {
-		return "Channel [id=" + id + ", name=" + name + "]";
 	}
 	
 	private Map<DeviceType, List<String>> sortDeviceIds(Set<Device> devices) {
@@ -120,6 +83,7 @@ public class Channel {
 		
 			try {
 				provider.push(pushNotification);
+				// TODO: return some kind of meaningful result
 			} catch(PushNotificationException e) {
 				// TODO : handle me
 				Logger.error("Encountered error attempting to push: " + e.getMessage(), e);
@@ -129,6 +93,43 @@ public class Channel {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Channel other = (Channel) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Channel [id=" + id + ", name=" + name + ", createdAt="
+				+ createdAt + ", updatedAt=" + updatedAt + "]";
 	}
 	
 }

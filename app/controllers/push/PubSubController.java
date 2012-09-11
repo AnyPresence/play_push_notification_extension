@@ -146,23 +146,6 @@ public class PubSubController extends Controller {
 			}
 		}
 	}
-
-	/**
-	def publish
-      channel = ::PushNotificationExtension::Channel.where(name: params[:channel]).first
-      if channel
-        begin
-          channel.publish params[:badge], params[:alert], params[:message_payload]
-          render :json => { :success => true }
-        rescue
-          render :json => { :success => false, :error => $!.message }
-        end
-      else
-        render :json => { :success => false, :error => "invalid channel" }
-      end
-    end
-
-	 */
 	
 	public static Result publish() {
 		Logger.debug("Publishing");

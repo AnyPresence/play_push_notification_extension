@@ -3,11 +3,11 @@ package models.push;
 import java.util.HashSet;
 import java.util.Set;
 
-import morphia.MorphiaBootstrapPlugin;
 
 import org.bson.types.ObjectId;
 
 import play.Logger;
+import plugin.morphia.MorphiaBootstrapPlugin;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Key;
@@ -19,7 +19,7 @@ import com.google.code.morphia.annotations.Reference;
 import com.mongodb.WriteResult;
 
 @Entity(value = "devices")
-public class Device {
+public class Device extends BaseEntity {
 
 	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
 	static { DS.ensureIndex(Device.class, "devices_token_type_index", "token, type", true, false); }
@@ -70,14 +70,9 @@ public class Device {
 	}
 
 	@Override
-	public String toString() {
-		return "Device [id=" + id + ", token=" + token + ", type=" + type + "]";
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((token == null) ? 0 : token.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -88,7 +83,7 @@ public class Device {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -108,4 +103,10 @@ public class Device {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Device [id=" + id + ", token=" + token + ", type=" + type
+				+ ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
+	}
+	
 }

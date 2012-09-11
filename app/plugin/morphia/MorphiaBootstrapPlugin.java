@@ -1,4 +1,4 @@
-package morphia;
+package plugin.morphia;
 
 import play.Application;
 import play.Logger;
