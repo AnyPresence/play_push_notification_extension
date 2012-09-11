@@ -132,26 +132,5 @@ public class Channel {
 		}
 		return null;
 	}
-
-	
-	/*public static Result sendMessageToAllRegistrants() {
-		
-		try {
-			PushedNotifications pn = Push
-					.alert("Hello from Java!", new File(
-							"/Users/rsnyder/Desktop/pushchat.p12"), "kongkong",
-							false,
-							"e8337c4294a0eb272f3eacd946e5f06b420fb778e04d9cd99672e52cfbc3fad2");
-			PushedNotifications success = pn.getSuccessfulNotifications();
-			PushedNotifications fail = pn.getFailedNotifications();
-
-			Logger.info("Successful push notifications : " + success.size());
-			Logger.info("Failed push notifications : " + fail.size());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return ok("I sent the push notification").as("text/plain");
-	}*/
 	
 }
