@@ -95,9 +95,7 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 			ResponseHandler<String> handler = new BasicResponseHandler();
 			String result = null;
 			result = CLIENT.execute(request, handler);
-			Logger.info("Got result " + result);
-			
-			// TODO : return some kind of status object
+			Logger.info("Response from GCM: " + result);
 			
 		} catch (ClientProtocolException e) {
 			throw new PushNotificationException("Encountered ClientProtocolException : " + e.getMessage(), e, " Unable to establish successful communication with GCM services");
