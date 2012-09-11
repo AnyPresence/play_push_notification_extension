@@ -74,24 +74,33 @@ public class Channel extends BaseEntity {
 	public <T extends PushNotification> String publish(Integer badge, JsonNode alert, JsonNode messagePayload) {
 		
 		Map<DeviceType, List<String>> deviceMap = sortDeviceIds(devices);
+		
+		StringBuffer errors = new StringBuffer("");
+		
 		for (Map.Entry<DeviceType, List<String>> entry : deviceMap.entrySet()) {
 			DeviceType type = entry.getKey();
 			List<String> deviceIds = entry.getValue();
 			
 			PushNotificationProvider<? extends PushNotification> provider = type.getPushNotificationProvider();
 			PushNotification pushNotification = provider.createPushNotification(badge, alert, messagePayload, deviceIds);
-		
+			
 			try {
 				provider.push(pushNotification);
-				// TODO: return some kind of meaningful result
 			} catch(PushNotificationException e) {
-				// TODO : handle me
 				Logger.error("Encountered error attempting to push: " + e.getMessage(), e);
+				if (!errors.toString().isEmpty()) {
+					errors.append("; ");
+				}
+				errors.append(e.getFriendlyApiError());
 			} catch(Exception e) {
-				// TODO : handle me
 				Logger.error("Encountered error attempting to push: " + e.getMessage(), e);
+				if (!errors.toString().isEmpty()) {
+					errors.append("; ");
+				}
+				errors.append("Unexpected error encountered");
 			}
 		}
+		
 		return null;
 	}
 
