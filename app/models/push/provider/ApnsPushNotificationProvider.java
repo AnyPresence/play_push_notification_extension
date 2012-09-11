@@ -11,8 +11,9 @@ import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
 import javapns.communication.exceptions.KeystoreException;
 import javapns.notification.PushNotificationPayload;
-
+import models.push.PushNotificationProvider;
 import models.push.notification.ApnsPushNotification;
+import models.push.notification.PushNotification;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -100,6 +101,11 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 	@Override
 	public Class<ApnsPushNotification> getPushNotificationImplementationClass() {
 		return ApnsPushNotification.class;
+	}
+
+	@Override
+	public PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds) {
+		return new ApnsPushNotification(badge, messagePayload, deviceIds, alert);
 	}
 
 }

@@ -1,8 +1,21 @@
 package models.push;
 
-public enum DeviceType {
-	android, ios;
+import models.push.notification.PushNotification;
+import models.push.provider.ApnsPushNotificationProvider;
+import models.push.provider.GcmPushNotificationProvider;
 
+public enum DeviceType {
+	
+	
+	android(new GcmPushNotificationProvider(PushNotificationConstants.GCM_URL, PushNotificationConstants.GCM_API_KEY)), 
+	ios(new ApnsPushNotificationProvider(PushNotificationConstants.APNS_KEYSTORE_FILE, PushNotificationConstants.APNS_KEYSTORE_PASSWORD));
+	
+	private PushNotificationProvider<? extends PushNotification> pushNotificationProvider;
+	
+	private DeviceType(PushNotificationProvider<? extends PushNotification> pushNotificationProvider) {
+		this.pushNotificationProvider = pushNotificationProvider;
+	}
+	
 	public static DeviceType fromDescription(String description) {
 		if (description == null || description.trim().isEmpty()) {
 			throw new IllegalArgumentException(
@@ -21,5 +34,9 @@ public enum DeviceType {
 					"Don't know how to match device type with description "
 							+ description);
 		}
+	}
+	
+	public PushNotificationProvider<? extends PushNotification> getPushNotificationProvider() {
+		return pushNotificationProvider;
 	}
 }

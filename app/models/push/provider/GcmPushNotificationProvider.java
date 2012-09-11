@@ -2,8 +2,11 @@ package models.push.provider;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
+import models.push.PushNotificationProvider;
 import models.push.notification.BasicPushNotification;
+import models.push.notification.PushNotification;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -16,6 +19,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import play.Logger;
@@ -108,6 +112,11 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 	@Override
 	public Class<BasicPushNotification> getPushNotificationImplementationClass() {
 		return BasicPushNotification.class;
+	}
+
+	@Override
+	public PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds) {
+		return new BasicPushNotification(badge, messagePayload, deviceIds);
 	}
 
 }

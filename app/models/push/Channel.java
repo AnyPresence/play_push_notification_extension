@@ -9,8 +9,6 @@ import java.util.Set;
 
 import models.push.notification.PushNotification;
 import models.push.provider.PushNotificationException;
-import models.push.provider.PushNotificationProvider;
-import models.push.provider.PushNotificationProviderFactory;
 import morphia.MorphiaBootstrapPlugin;
 
 import org.bson.types.ObjectId;
@@ -117,8 +115,8 @@ public class Channel {
 			DeviceType type = entry.getKey();
 			List<String> deviceIds = entry.getValue();
 			
-			PushNotification pushNotification = PushNotificationProviderFactory.createPushNotification(type, badge, alert, messagePayload, deviceIds);
-			PushNotificationProvider<? extends PushNotification> provider = PushNotificationProviderFactory.getPushNotificationProvider(type);
+			PushNotificationProvider<? extends PushNotification> provider = type.getPushNotificationProvider();
+			PushNotification pushNotification = provider.createPushNotification(badge, alert, messagePayload, deviceIds);
 		
 			try {
 				provider.push(pushNotification);
