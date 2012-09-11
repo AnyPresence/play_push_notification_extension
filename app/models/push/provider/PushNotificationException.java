@@ -1,4 +1,4 @@
-package models.pushnotification.provider;
+package models.push.provider;
 
 public class PushNotificationException extends RuntimeException {
 

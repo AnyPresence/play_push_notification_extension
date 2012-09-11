@@ -1,9 +1,9 @@
-package models.pushnotification.provider;
+package models.push.provider;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-import models.pushnotification.notification.BasicPushNotification;
+import models.push.notification.BasicPushNotification;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;

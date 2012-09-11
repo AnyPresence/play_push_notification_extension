@@ -1,4 +1,4 @@
-package models.pushnotification;
+package models.push;
 
 public enum DeviceType {
 	android, ios;

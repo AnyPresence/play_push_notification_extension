@@ -1,4 +1,4 @@
-package controllers.pushnotification;
+package controllers.push;
 
 import java.util.HashSet;
 import java.util.Set;

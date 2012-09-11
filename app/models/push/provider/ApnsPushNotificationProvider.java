@@ -1,4 +1,4 @@
-package models.pushnotification.provider;
+package models.push.provider;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import javapns.communication.exceptions.CommunicationException;
 import javapns.communication.exceptions.KeystoreException;
 import javapns.notification.PushNotificationPayload;
 
-import models.pushnotification.notification.ApnsPushNotification;
+import models.push.notification.ApnsPushNotification;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;

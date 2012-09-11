@@ -1,12 +1,12 @@
-package models.pushnotification.provider;
+package models.push.provider;
 
 import java.io.File;
 import java.util.List;
 
-import models.pushnotification.DeviceType;
-import models.pushnotification.notification.ApnsPushNotification;
-import models.pushnotification.notification.BasicPushNotification;
-import models.pushnotification.notification.PushNotification;
+import models.push.DeviceType;
+import models.push.notification.ApnsPushNotification;
+import models.push.notification.BasicPushNotification;
+import models.push.notification.PushNotification;
 
 import org.codehaus.jackson.JsonNode;
 

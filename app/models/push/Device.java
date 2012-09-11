@@ -1,4 +1,4 @@
-package models.pushnotification;
+package models.push;
 
 import java.util.HashSet;
 import java.util.Set;

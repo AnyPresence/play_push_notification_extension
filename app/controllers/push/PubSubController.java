@@ -1,8 +1,8 @@
-package controllers.pushnotification;
+package controllers.push;
 
-import models.pushnotification.Channel;
-import models.pushnotification.Device;
-import models.pushnotification.DeviceType;
+import models.push.Channel;
+import models.push.Device;
+import models.push.DeviceType;
 
 import org.codehaus.jackson.JsonNode;
 

@@ -1,6 +1,6 @@
-package models.pushnotification.provider;
+package models.push.provider;
 
-import models.pushnotification.notification.PushNotification;
+import models.push.notification.PushNotification;
 
 
 public abstract class PushNotificationProvider<T extends PushNotification> {

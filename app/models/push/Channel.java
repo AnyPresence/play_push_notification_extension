@@ -1,4 +1,4 @@
-package models.pushnotification;
+package models.push;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import models.pushnotification.notification.PushNotification;
-import models.pushnotification.provider.PushNotificationException;
-import models.pushnotification.provider.PushNotificationProvider;
-import models.pushnotification.provider.PushNotificationProviderFactory;
+import models.push.notification.PushNotification;
+import models.push.provider.PushNotificationException;
+import models.push.provider.PushNotificationProvider;
+import models.push.provider.PushNotificationProviderFactory;
 import morphia.MorphiaBootstrapPlugin;
 
 import org.bson.types.ObjectId;

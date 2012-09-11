@@ -1,4 +1,4 @@
-package models.pushnotification.notification;
+package models.push.notification;
 
 import java.io.Serializable;
 import java.util.List;

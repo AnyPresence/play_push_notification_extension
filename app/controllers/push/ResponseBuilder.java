@@ -1,4 +1,4 @@
-package controllers.pushnotification;
+package controllers.push;
 
 import org.codehaus.jackson.node.ObjectNode;
 
