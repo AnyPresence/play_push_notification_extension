@@ -13,35 +13,13 @@ import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Key;
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
+import com.google.code.morphia.annotations.PrePersist;
+import com.google.code.morphia.annotations.PreSave;
 import com.google.code.morphia.annotations.Reference;
 import com.mongodb.WriteResult;
 
 @Entity(value = "devices")
 public class Device {
-
-	public static enum DeviceType {
-		android, ios;
-
-		public static DeviceType fromDescription(String description) {
-			if (description == null || description.trim().isEmpty()) {
-				throw new IllegalArgumentException(
-						"description must be provided");
-			}
-
-			String lowerUa = description.toLowerCase();
-
-			if (lowerUa.contains("iphone") || lowerUa.contains("ipad")
-					|| lowerUa.contains("ipod")) {
-				return ios;
-			} else if (lowerUa.contains("android")) {
-				return android;
-			} else {
-				throw new IllegalArgumentException(
-						"Don't know how to match device type with description "
-								+ description);
-			}
-		}
-	}
 
 	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
 	static { DS.ensureIndex(Device.class, "devices_token_type_index", "token, type", true, false); }
@@ -74,15 +52,21 @@ public class Device {
 	}
 
 	public static Device findByTokenAndType(String token, DeviceType type) {
-		return DS.createQuery(Device.class).filter("token", token).filter("type", type.toString()).get();
+		return DS.createQuery(Device.class).filter("token", scrubToken(token)).filter("type", type.toString()).get();
 	}
 	
 	public static void update(Device device) {
 		DS.save(device);
 	}
 
+	@PreSave
+	@PrePersist
 	public void scrub() {
-		// TODO: implement me
+	    this.token = scrubToken(this.token);
+	}
+	
+	private static String scrubToken(String token) {
+	    return token.replaceAll("[\\s<>]", "");
 	}
 
 	@Override

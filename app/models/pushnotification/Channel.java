@@ -1,11 +1,20 @@
 package models.pushnotification;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import models.pushnotification.notification.PushNotification;
+import models.pushnotification.provider.PushNotificationException;
+import models.pushnotification.provider.PushNotificationProvider;
+import models.pushnotification.provider.PushNotificationProviderFactory;
 import morphia.MorphiaBootstrapPlugin;
 
 import org.bson.types.ObjectId;
+import org.codehaus.jackson.JsonNode;
 
 import play.Logger;
 
@@ -86,5 +95,63 @@ public class Channel {
 	public String toString() {
 		return "Channel [id=" + id + ", name=" + name + "]";
 	}
+	
+	private Map<DeviceType, List<String>> sortDeviceIds(Set<Device> devices) {
+		
+		Map<DeviceType, List<String>> deviceMap = new HashMap<DeviceType, List<String>>();
+		for (Device d : devices) {
+			List<String> deviceIds = deviceMap.get(d.type);
+			if (deviceIds == null) {
+				deviceIds = new ArrayList<String>();
+				deviceMap.put(d.type, deviceIds);
+			}
+			deviceIds.add(d.token);
+		}
+		return deviceMap;
+	}
+	
+	public <T extends PushNotification> String publish(Integer badge, JsonNode alert, JsonNode messagePayload) {
+		
+		Map<DeviceType, List<String>> deviceMap = sortDeviceIds(devices);
+		for (Map.Entry<DeviceType, List<String>> entry : deviceMap.entrySet()) {
+			DeviceType type = entry.getKey();
+			List<String> deviceIds = entry.getValue();
+			
+			PushNotification pushNotification = PushNotificationProviderFactory.createPushNotification(type, badge, alert, messagePayload, deviceIds);
+			PushNotificationProvider<? extends PushNotification> provider = PushNotificationProviderFactory.getPushNotificationProvider(type);
+		
+			try {
+				provider.push(pushNotification);
+			} catch(PushNotificationException e) {
+				// TODO : handle me
+				Logger.error("Encountered error attempting to push: " + e.getMessage(), e);
+			} catch(Exception e) {
+				// TODO : handle me
+				Logger.error("Encountered error attempting to push: " + e.getMessage(), e);
+			}
+		}
+		return null;
+	}
 
+	
+	/*public static Result sendMessageToAllRegistrants() {
+		
+		try {
+			PushedNotifications pn = Push
+					.alert("Hello from Java!", new File(
+							"/Users/rsnyder/Desktop/pushchat.p12"), "kongkong",
+							false,
+							"e8337c4294a0eb272f3eacd946e5f06b420fb778e04d9cd99672e52cfbc3fad2");
+			PushedNotifications success = pn.getSuccessfulNotifications();
+			PushedNotifications fail = pn.getFailedNotifications();
+
+			Logger.info("Successful push notifications : " + success.size());
+			Logger.info("Failed push notifications : " + fail.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ok("I sent the push notification").as("text/plain");
+	}*/
+	
 }

@@ -1,6 +1,6 @@
 package controllers.pushnotification;
 
-import models.pushnotification.Device.DeviceType;
+import models.pushnotification.DeviceType;
 import play.Logger;
 import play.mvc.Action;
 import play.mvc.Http.Context;

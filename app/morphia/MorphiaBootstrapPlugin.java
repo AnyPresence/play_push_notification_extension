@@ -41,7 +41,7 @@ public class MorphiaBootstrapPlugin extends Plugin {
 	public void onStart() {
 		
 		super.onStart();
-		
+	
 		try {
 			mongo = new MongoURI(app.configuration().getString("mongodb.uri")).connect();
 			morphia = new Morphia();

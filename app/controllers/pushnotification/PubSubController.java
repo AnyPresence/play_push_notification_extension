@@ -2,7 +2,7 @@ package controllers.pushnotification;
 
 import models.pushnotification.Channel;
 import models.pushnotification.Device;
-import models.pushnotification.Device.DeviceType;
+import models.pushnotification.DeviceType;
 
 import org.codehaus.jackson.JsonNode;
 
@@ -13,6 +13,13 @@ import play.mvc.With;
 
 import com.mongodb.MongoException;
 
+/**
+ * TODO: refactor some of the validation logic -- also there might be a better
+ * 'built-in' way of doing it using the play framework features ...
+ * 
+ * @author rsnyder
+ *
+ */
 public class PubSubController extends Controller {
 
 	@With(value = DeviceTypeDetector.class)
@@ -84,30 +91,6 @@ public class PubSubController extends Controller {
 			}
 		}
 	}
-
-	/*
-	 def unsubscribe
-      device = ::PushNotificationExtension::Device.where(token: params[:device_token], type: @device_type).first
-      if device
-        Rails.logger.info "Received unsubscribe request from mobile device: " + device.inspect
-        channel = ::PushNotificationExtension::Channel.where(name: params[:channel]).first
-        if channel
-          begin
-            channel.devices.delete device
-            device.channels.delete channel
-            render :json => { :success => true }
-          rescue
-            render :json => { :success => false, :error => $!.message }
-          end
-        else
-          render :json => { :success => false, :error => "invalid channel" }
-        end
-      else
-        render :json => { :success => false, :error => "invalid device" }
-      end
-    end
-
-	 */
 	
 	@With(value = DeviceTypeDetector.class)
 	public static Result unsubscribe() {
@@ -132,6 +115,8 @@ public class PubSubController extends Controller {
 				DeviceType deviceType = DeviceType.valueOf(flash().get(
 						DeviceType.class.getSimpleName()));
 
+				Logger.debug("Received unsubscription request for channel " + channelStr + ", deviceToken " + deviceTokenStr + ", " + deviceType);
+				
 				if (channelStr == null || channelStr.isEmpty()
 						|| deviceTokenStr == null || deviceTokenStr.isEmpty()) {
 					return ResponseBuilder.badRequestJsonResponse(false, "must provide valid channel and device_token parameters");
@@ -162,10 +147,63 @@ public class PubSubController extends Controller {
 		}
 	}
 
+	/**
+	def publish
+      channel = ::PushNotificationExtension::Channel.where(name: params[:channel]).first
+      if channel
+        begin
+          channel.publish params[:badge], params[:alert], params[:message_payload]
+          render :json => { :success => true }
+        rescue
+          render :json => { :success => false, :error => $!.message }
+        end
+      else
+        render :json => { :success => false, :error => "invalid channel" }
+      end
+    end
+
+	 */
+	
 	public static Result publish() {
 		Logger.debug("Publishing");
-		return ok("<html><body><h1>Published</h1></body></html>").as(
-				"text/html");
+		
+		JsonNode json = request().body().asJson();
+
+		Logger.debug("Converted to JsonNode object " + json
+				+ "...attempting to convert to Device object");
+
+		if (json == null) {
+			return ResponseBuilder.badRequestJsonResponse(false, "no json provided in request body");
+		} else {
+			JsonNode channelName = json.get("channel");
+			JsonNode badge = json.get("badge");
+			JsonNode alert = json.get("alert");
+			JsonNode messagePayload = json.get("message_payload");
+			Logger.info("Serialized : " + messagePayload.toString());
+
+			if (channelName == null || badge == null || alert == null || messagePayload == null)  {
+				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel, badge, alert, and message_payload parameters");
+			} else {
+				String channelStr = channelName.asText();
+				Integer badgeInt = badge == null ? null : badge.asInt();
+				
+				if (channelStr.trim().isEmpty()) {
+					return ResponseBuilder.badRequestJsonResponse(false, "must provide values for channel, badge, alert, and message_payload parameters");
+				} else {
+					Channel channel = Channel.findByName(channelStr);
+					if (channel == null) { 
+						return ResponseBuilder.okJsonResponse(false, "Invalid channel");
+					} else {
+						String errorMessage = channel.publish(badgeInt, alert, messagePayload);
+						if (errorMessage == null) {
+							return ResponseBuilder.okJsonResponse(true);
+						} else {
+							return ResponseBuilder.okJsonResponse(false, errorMessage);
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

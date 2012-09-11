@@ -2,17 +2,10 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-#GET     /                           controllers.Application.index()
-
-#GET     /register/:id               controllers.Application.register(id)
-#GET     /unregister/:id             controllers.Application.unregister(id)
-
-#GET     /send                       controllers.Application.sendMessageToAllRegistrants()
-
-#  post 'subscribe' => 'pub_sub#subscribe'
-#  post 'unsubscribe' => 'pub_sub#unsubscribe'
-#  post 'publish' => 'pub_sub#publish'
+#
+# A simple restful API allowing mobile apps to subscribe and unsubscribe to various push 
+# notifications, as well as publish notifications.
+#
 
 POST     /subscribe                  controllers.pushnotification.PubSubController.subscribe()
 POST     /unsubscribe                controllers.pushnotification.PubSubController.unsubscribe()
