@@ -3,6 +3,6 @@
 # notifications, as well as publish notifications.
 #
 
-POST     /subscribe                  controllers.push.PubSubController.subscribe()
-POST     /unsubscribe                controllers.push.PubSubController.unsubscribe()
-POST     /publish                    controllers.push.PubSubController.publish()
+POST     /api/push_notification_extension/subscribe                  controllers.push.PubSubController.subscribe()
+POST     /api/push_notification_extension/unsubscribe                controllers.push.PubSubController.unsubscribe()
+POST     /api/push_notification_extension/publish                    controllers.push.PubSubController.publish()

@@ -1,32 +1,22 @@
 package models.push.provider;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
 import models.push.notification.BasicPushNotification;
 import models.push.notification.PushNotification;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import play.Logger;
+import play.libs.F.Promise;
+import play.libs.WS;
 
 public class GcmPushNotificationProvider extends PushNotificationProvider<BasicPushNotification> {
 
-	private static final HttpClient CLIENT = new DefaultHttpClient();
-	
 	private String gcmPushUrl;
 	private String gcmApiKey;
 	
@@ -77,30 +67,17 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 			
 			writer.flush();
 			
-			HttpPost request = new HttpPost(gcmPushUrl);
-			
 			StringBuffer buf = writer.getBuffer();
 			String json = buf.toString();
 			try { writer.close(); } catch(Exception e) { } // don't care!
 			
 			Logger.info("json is : " + json);
 	
-			StringEntity se = new StringEntity(json, HTTP.UTF_8);
-			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-	
-			request.addHeader("Content-Type", "application/json");
-			request.addHeader("Authorization", "key=" + gcmApiKey);
-			request.setEntity(se);
-	
-			ResponseHandler<String> handler = new BasicResponseHandler();
-			String result = null;
-			result = CLIENT.execute(request, handler);
-			Logger.info("Response from GCM: " + result);
+			//String result = null;
+			Promise<WS.Response> resp = WS.url(gcmPushUrl).setHeader("Content-Type", "application/json").setHeader("Authorization", "key=" + gcmApiKey).post(json);
+			//result = resp.get().getBody();
+			//Logger.info("Response from GCM: " + result);
 			
-		} catch (ClientProtocolException e) {
-			throw new PushNotificationException("Encountered ClientProtocolException : " + e.getMessage(), e, " Unable to establish successful communication with GCM services");
-		} catch (IOException e) {
-			throw new PushNotificationException("Encountered IOException : " + e.getMessage(), e, "Unable to establish successful communication with GCM services");
 		} catch (Exception e) {
 			throw new PushNotificationException("Encountered unexpected error : " + e.getMessage(), e, "An unexpected error occurred");
 		}

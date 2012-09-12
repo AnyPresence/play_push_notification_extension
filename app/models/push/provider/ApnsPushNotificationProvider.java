@@ -44,6 +44,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 		List<String> appleDeviceTokens = pushNotification.getDeviceIds();
 		
 		JsonFactory fact = new ObjectMapper().getJsonFactory();
+		
 		StringWriter writer = new StringWriter();
 		
 		

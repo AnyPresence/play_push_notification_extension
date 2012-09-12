@@ -9,7 +9,6 @@ object ApplicationBuild extends Build {
 
 
     val appDependencies = Seq(
-      "org.apache.httpcomponents" % "httpclient" % "4.1.1",
       "com.anypresence.play" % "morphia-bootstrap_2.9.1" % "1.0-SNAPSHOT",
       "com.google.code.morphia"    % "morphia"               % "1.00-SNAPSHOT",
       //"com.google.code.morphia"    % "morphia"               % "0.99",
