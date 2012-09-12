@@ -73,10 +73,10 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 			
 			Logger.info("json is : " + json);
 	
-			//String result = null;
+			String result = null;
 			Promise<WS.Response> resp = WS.url(gcmPushUrl).setHeader("Content-Type", "application/json").setHeader("Authorization", "key=" + gcmApiKey).post(json);
-			//result = resp.get().getBody();
-			//Logger.info("Response from GCM: " + result);
+			result = resp.get().getBody();
+			Logger.info("Response from GCM: " + result);
 			
 		} catch (Exception e) {
 			throw new PushNotificationException("Encountered unexpected error : " + e.getMessage(), e, "An unexpected error occurred");
