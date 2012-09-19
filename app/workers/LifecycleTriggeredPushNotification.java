@@ -1,4 +1,4 @@
-package workers.push;
+package workers;
 
 import models.push.Channel;
 
