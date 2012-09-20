@@ -1,8 +1,0 @@
-#
-# A simple restful API allowing mobile apps to subscribe and unsubscribe to various push 
-# notifications, as well as publish notifications.
-#
-
-POST     /api/push_notification_extension/subscribe                  controllers.push.PubSubController.subscribe()
-POST     /api/push_notification_extension/unsubscribe                controllers.push.PubSubController.unsubscribe()
-POST     /api/push_notification_extension/publish                    controllers.push.PubSubController.publish()
