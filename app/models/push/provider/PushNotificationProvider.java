@@ -15,10 +15,11 @@ public abstract class PushNotificationProvider<T extends PushNotification> {
 	public  void push(PushNotification pushNotification) {
 		Class<T> klass = getPushNotificationImplementationClass();
 		T t = klass.cast(pushNotification);
+		Boolean pushTestEnabled = Play.application().configuration().getBoolean("push.test.enabled");
 		if (Play.application().isProd()) {
 			Logger.debug("App running in production -- pushing notification");
 			pushIt(t);
-		} else if (Play.application().configuration().getBoolean("push.test.enabled")) {
+		} else if (pushTestEnabled != null && pushTestEnabled) {
 			Logger.debug("App not running in production, but push.test.enabled is true");
 			pushIt(t);
 		} else {
