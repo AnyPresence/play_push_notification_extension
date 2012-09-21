@@ -11,11 +11,11 @@ public class LifecycleTriggeredPushNotification implements Runnable
 {
 
 	private String channelName;
-	private Integer badge;
+	private String badge;
 	private String alert;
 	private String messagePayload;
 	
-	public LifecycleTriggeredPushNotification(String channelName, Integer badge, String alert, String messagePayload) {
+	public LifecycleTriggeredPushNotification(String channelName, String badge, String alert, String messagePayload) {
 		this.channelName = channelName;
 		this.badge = badge;
 		this.alert = alert;
@@ -25,9 +25,16 @@ public class LifecycleTriggeredPushNotification implements Runnable
 	@Override
 	public void run() {
 		Channel channel = Channel.findByName(channelName);
+		int badge = 0;
 		if (channel != null) {
 			
-			if (badge == null) { 
+			if (this.badge == null) { 
+				badge = 0;
+			}
+			try {
+				badge = Integer.parseInt(this.badge);
+			} catch(NumberFormatException e) {
+				Logger.info("Provided value for badge field was not a valid Integer : " + this.badge + ". Defaulting to 0");
 				badge = 0;
 			}
 		
