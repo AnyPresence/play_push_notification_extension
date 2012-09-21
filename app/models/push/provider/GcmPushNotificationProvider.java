@@ -26,7 +26,7 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 	}
 
 	@Override
-	public void pushIt(BasicPushNotification push) {
+	public void pushIt(BasicPushNotification push, boolean prod) {
 		BasicPushNotification pushNotification = getPushNotificationImplementationClass().cast(push);
 		
 		try {

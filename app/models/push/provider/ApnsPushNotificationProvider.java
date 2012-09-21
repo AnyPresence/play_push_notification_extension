@@ -22,7 +22,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONException;
 
 import play.Logger;
-import play.Play;
 
 public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsPushNotification> {
 
@@ -35,7 +34,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 	}
 	
 	@Override
-	protected void pushIt(ApnsPushNotification pushNotification) {
+	protected void pushIt(ApnsPushNotification pushNotification, boolean prod) {
 		Logger.info("Pushing to apple...");
 		
 		JsonNode messagePayload = pushNotification.getMessagePayload();
@@ -84,7 +83,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 			
 			Logger.info("APNS JSON String : " + writer.toString());
 			PushNotificationPayload payload = new PushNotificationPayload(writer.toString());
-			PushedNotifications notifications = Push.payload(payload, apnsKeystoreFile, apnsKeystorePassword, Play.application().isProd(), appleDeviceTokens.toArray(new String[appleDeviceTokens.size()]));
+			PushedNotifications notifications = Push.payload(payload, apnsKeystoreFile, apnsKeystorePassword, prod, appleDeviceTokens.toArray(new String[appleDeviceTokens.size()]));
 			Logger.info("Successful push count : " + notifications.getSuccessfulNotifications().size());
 			Logger.info("Failed push count : " + notifications.getFailedNotifications().size());
 		} catch(IOException e) {
