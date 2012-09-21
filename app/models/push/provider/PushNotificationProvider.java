@@ -16,6 +16,9 @@ public abstract class PushNotificationProvider<T extends PushNotification> {
 		Class<T> klass = getPushNotificationImplementationClass();
 		T t = klass.cast(pushNotification);
 		Boolean pushEnabled = Play.application().configuration().getBoolean("push.enabled");
+		if (pushEnabled == null) { 
+			pushEnabled = false;
+		}
 		Boolean pushToProd = Play.application().configuration().getBoolean("push.to.prod");
 		if (pushToProd == null) { 
 			pushToProd = false;
