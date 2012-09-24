@@ -10,8 +10,8 @@ public class ApnsPushNotification extends PushNotification {
 
 	private JsonNode alert;
 	
-	public ApnsPushNotification(Integer badge, JsonNode messagePayload, List<String> deviceIds, JsonNode alert) {
-		super(badge, messagePayload, deviceIds);
+	public ApnsPushNotification(Integer badge, JsonNode messagePayload, List<String> deviceIds, JsonNode alert, boolean pushToProd) {
+		super(badge, messagePayload, deviceIds, pushToProd);
 		this.alert = alert;
 	}
 

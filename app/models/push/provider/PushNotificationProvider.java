@@ -19,25 +19,22 @@ public abstract class PushNotificationProvider<T extends PushNotification> {
 		if (pushEnabled == null) { 
 			pushEnabled = false;
 		}
-		Boolean pushToProd = Play.application().configuration().getBoolean("push.to.prod");
-		if (pushToProd == null) { 
-			pushToProd = false;
-		}
+		boolean pushToProd = pushNotification.isPushToProd();
 		if (pushEnabled && pushToProd) {
 			Logger.debug("Sending push notification to production");
-			pushIt(t, pushToProd);
+			pushIt(t);
 		} else if (pushEnabled  && !pushToProd) {
 			Logger.debug("Sending push notification through non-production servers");
-			pushIt(t, pushToProd);
+			pushIt(t);
 		} else {
 			Logger.debug("Not pushing notification because test is not enabled and not running in prod");
 		}
 	}
 	
-	public abstract PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds);
+	public abstract PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds, boolean pushToProd);
 	
 	protected abstract Class<T> getPushNotificationImplementationClass();
 	
-	protected abstract void pushIt(T pushNotification, boolean prod);
+	protected abstract void pushIt(T pushNotification);
 	
 }

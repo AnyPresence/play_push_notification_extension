@@ -26,7 +26,7 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 	}
 
 	@Override
-	public void pushIt(BasicPushNotification push, boolean prod) {
+	public void pushIt(BasicPushNotification push) {
 		BasicPushNotification pushNotification = getPushNotificationImplementationClass().cast(push);
 		
 		try {
@@ -89,8 +89,8 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 	}
 
 	@Override
-	public PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds) {
-		return new BasicPushNotification(badge, messagePayload, deviceIds);
+	public PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds, boolean pushToProd) {
+		return new BasicPushNotification(badge, messagePayload, deviceIds, pushToProd);
 	}
 
 }

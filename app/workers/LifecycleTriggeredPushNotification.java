@@ -10,12 +10,14 @@ import play.libs.Json;
 public class LifecycleTriggeredPushNotification implements Runnable
 {
 
+        private String pushToProd;
 	private String channelName;
 	private String badge;
 	private String alert;
 	private String messagePayload;
 	
-	public LifecycleTriggeredPushNotification(String channelName, String badge, String alert, String messagePayload) {
+	public LifecycleTriggeredPushNotification(String pushToProd, String channelName, String badge, String alert, String messagePayload) {
+                this.pushToProd = pushToProd;
 		this.channelName = channelName;
 		this.badge = badge;
 		this.alert = alert;
@@ -31,6 +33,9 @@ public class LifecycleTriggeredPushNotification implements Runnable
 			if (this.badge == null) { 
 				badge = 0;
 			}
+
+			boolean shouldPush = Boolean.parseBoolean(pushToProd);
+
 			try {
 				badge = Integer.parseInt(this.badge);
 			} catch(NumberFormatException e) {
@@ -42,7 +47,7 @@ public class LifecycleTriggeredPushNotification implements Runnable
 				JsonNode alertNode = Json.parse(alert);
 				JsonNode messagePayloadNode = Json.parse(messagePayload);
 				
-				channel.publish(badge, alertNode, messagePayloadNode);
+				channel.publish(badge, alertNode, messagePayloadNode, shouldPush);
 			} catch(Exception e) {
 				Logger.error("Couldn't send push notification because alert or message payload could not be parsed to a valid JSON node. \n  alert : " + alert + "\n  messagePayload : " + messagePayload);
 			}

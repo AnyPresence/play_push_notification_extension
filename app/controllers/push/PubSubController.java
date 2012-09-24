@@ -7,6 +7,7 @@ import models.push.DeviceType;
 import org.codehaus.jackson.JsonNode;
 
 import play.Logger;
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
@@ -177,7 +178,7 @@ public class PubSubController extends Controller {
 					if (channel == null) { 
 						return ResponseBuilder.okJsonResponse(false, "Invalid channel");
 					} else {
-						String errorMessage = channel.publish(badgeInt, alert, messagePayload);
+						String errorMessage = channel.publish(badgeInt, alert, messagePayload, Play.application().isProd());
 						if (errorMessage == null) {
 							return ResponseBuilder.okJsonResponse(true);
 						} else {

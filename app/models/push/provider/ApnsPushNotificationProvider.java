@@ -34,7 +34,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 	}
 	
 	@Override
-	protected void pushIt(ApnsPushNotification pushNotification, boolean prod) {
+	protected void pushIt(ApnsPushNotification pushNotification) {
 		Logger.info("Pushing to apple...");
 		
 		JsonNode messagePayload = pushNotification.getMessagePayload();
@@ -83,6 +83,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 			
 			Logger.info("APNS JSON String : " + writer.toString());
 			PushNotificationPayload payload = new PushNotificationPayload(writer.toString());
+			boolean prod = pushNotification.isPushToProd();
 			PushedNotifications notifications = Push.payload(payload, apnsKeystoreFile, apnsKeystorePassword, prod, appleDeviceTokens.toArray(new String[appleDeviceTokens.size()]));
 			Logger.info("Successful push count : " + notifications.getSuccessfulNotifications().size());
 			Logger.info("Failed push count : " + notifications.getFailedNotifications().size());
@@ -105,8 +106,8 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 	}
 
 	@Override
-	public PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds) {
-		return new ApnsPushNotification(badge, messagePayload, deviceIds, alert);
+	public PushNotification createPushNotification(Integer badge, JsonNode alert, JsonNode messagePayload, List<String> deviceIds, boolean pushToProd) {
+		return new ApnsPushNotification(badge, messagePayload, deviceIds, alert, pushToProd);
 	}
 
 }

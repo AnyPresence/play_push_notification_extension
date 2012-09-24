@@ -12,11 +12,13 @@ public abstract class PushNotification implements Serializable {
 	private Integer badge;
 	private JsonNode messagePayload;
 	private List<String> deviceIds;
+	private boolean pushToProd;
 	
-	public PushNotification(Integer badge, JsonNode messagePayload, List<String> deviceIds) {
+	public PushNotification(Integer badge, JsonNode messagePayload, List<String> deviceIds, boolean pushToProd) {
 		this.badge = badge;
 		this.messagePayload = messagePayload;
 		this.deviceIds = deviceIds;
+		this.pushToProd = pushToProd;
 	}
 	
 	public Integer getBadge() {
@@ -39,6 +41,10 @@ public abstract class PushNotification implements Serializable {
 	public void setDeviceIds(List<String> deviceIds) {
 		this.deviceIds = deviceIds;
 	}
+
+	public boolean isPushToProd() { 
+		return pushToProd;
+	}
 	
 	@Override
 	public int hashCode() {
@@ -49,6 +55,8 @@ public abstract class PushNotification implements Serializable {
 				+ ((deviceIds == null) ? 0 : deviceIds.hashCode());
 		result = prime * result
 				+ ((messagePayload == null) ? 0 : messagePayload.hashCode());
+		result = prime * result
+				+ (pushToProd ? 1 : 0);
 		return result;
 	}
 	
@@ -76,6 +84,9 @@ public abstract class PushNotification implements Serializable {
 				return false;
 		} else if (!messagePayload.equals(other.messagePayload))
 			return false;
+                if (pushToProd != other.pushToProd) {
+			return false;
+		}
 		return true;
 	}
 	

@@ -71,7 +71,7 @@ public class Channel extends BaseEntity {
 		return deviceMap;
 	}
 	
-	public <T extends PushNotification> String publish(Integer badge, JsonNode alert, JsonNode messagePayload) {
+	public <T extends PushNotification> String publish(Integer badge, JsonNode alert, JsonNode messagePayload, boolean pushToProd) {
 		
 		Map<DeviceType, List<String>> deviceMap = sortDeviceIds(devices);
 		
@@ -82,7 +82,7 @@ public class Channel extends BaseEntity {
 			List<String> deviceIds = entry.getValue();
 			
 			PushNotificationProvider<? extends PushNotification> provider = type.getPushNotificationProvider();
-			PushNotification pushNotification = provider.createPushNotification(badge, alert, messagePayload, deviceIds);
+			PushNotification pushNotification = provider.createPushNotification(badge, alert, messagePayload, deviceIds, pushToProd);
 			
 			try {
 				provider.push(pushNotification);
