@@ -27,7 +27,7 @@ public class PushNotificationExtensionPlugin extends Plugin {
 	@Override
 	public boolean enabled() {
 		Boolean enabled = app.configuration().getBoolean("push_notification_extension_enabled");
-		return enabled == null ? true : enabled;
+		return enabled == null ? false : enabled;
 	}
 
 	@Override
