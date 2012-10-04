@@ -35,6 +35,12 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 	
 	@Override
 	protected void pushIt(ApnsPushNotification pushNotification) {
+
+		if (apnsKeystoreFile == null) { 
+			Logger.info("Can't push to apple because keystore file has not been configured -- push to apple will be skipped");
+			return;
+		}		
+
 		Logger.info("Pushing to apple...");
 		
 		JsonNode messagePayload = pushNotification.getMessagePayload();

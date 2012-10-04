@@ -27,6 +27,12 @@ public class GcmPushNotificationProvider extends PushNotificationProvider<BasicP
 
 	@Override
 	public void pushIt(BasicPushNotification push) {
+
+		if (gcmApiKey == null) { 
+			Logger.info("Unable to send push notification through GCM service, because gcmApiKey is not defined!");
+			return;
+		}
+
 		BasicPushNotification pushNotification = getPushNotificationImplementationClass().cast(push);
 		
 		try {

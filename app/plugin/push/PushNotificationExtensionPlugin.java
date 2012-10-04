@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import play.Application;
+import play.Logger;
 import play.Play;
 import play.Plugin;
 
@@ -34,37 +35,40 @@ public class PushNotificationExtensionPlugin extends Plugin {
 	public void onStart() {
 		
 		String appleCertFile = PushNotificationConstants.APPLE_CERT;
+
+		File appleCert = null;
 		
 		if (appleCertFile == null) { 
-			throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- no 'apple_cert' option provided in configuration -- should be file containing the apple certificate, relative to root of play application!");
-		}
+			Logger.info("No apple cert file defined.  No push notifications will be sent to Apple");
+		} else {
+			appleCert = Play.application().getFile(appleCertFile);
+	                if (!appleCert.exists()) {
+        	                throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- apple cert file " + appleCert.getAbsolutePath() + " was not found!  Should be relative to the root of the play application");
+                	}
 		
-		File appleCert = Play.application().getFile(appleCertFile);
-		if (!appleCert.exists()) {
-			throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- apple cert file " + appleCert.getAbsolutePath() + " was not found!  Should be relative to the root of the play application");
-		}
-		
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(appleCert));
-			String line = null;
-			Pattern pattern = Pattern.compile("Apple Development IOS Push Services");
-			boolean match = false;
-			while ((line = reader.readLine()) != null && !match) { 
-				Matcher m = pattern.matcher(line);
-				match = m.find();
+			BufferedReader reader = null;
+			try {
+				reader = new BufferedReader(new FileReader(appleCert));
+				String line = null;
+				Pattern pattern = Pattern.compile("Apple Development IOS Push Services");
+				boolean match = false;
+				while ((line = reader.readLine()) != null && !match) { 
+					Matcher m = pattern.matcher(line);
+					match = m.find();
+				}
+			} catch(FileNotFoundException e) { 
+				throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because file " + appleCert.getAbsolutePath() + " could not be read, due to FileNotFoundException", e);
+			} catch(IOException e) { 
+				throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because file " + appleCert.getAbsolutePath() + " could not be read, due to IOException", e);
+			} finally {
+				try { if (reader != null) { reader.close(); } } catch(IOException e) { } // don't care about exc on close
 			}
-		} catch(FileNotFoundException e) { 
-			throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because file " + appleCert.getAbsolutePath() + " could not be read, due to FileNotFoundException", e);
-		} catch(IOException e) { 
-			throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because file " + appleCert.getAbsolutePath() + " could not be read, due to IOException", e);
-		} finally {
-			try { if (reader != null) { reader.close(); } } catch(IOException e) { } // don't care about exc on close
+
 		}
 		
 		
 		String appleCertPassword = PushNotificationConstants.APPLE_CERT_PASSWORD;
-		if (appleCertPassword == null) { 
+		if (appleCert != null && appleCertPassword == null) { 
 			throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- no password provided for apple cert under config key 'apple_cert_password'!");
 		}
 		
@@ -72,7 +76,11 @@ public class PushNotificationExtensionPlugin extends Plugin {
 		
 		String gcmApiKey = PushNotificationConstants.GCM_API_KEY;
 		if (gcmApiKey == null) { 
-			throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- no GCM api key defined in configuration -- should be the API key used to connect to google cloud messaging (GCM) services under config option 'gcm_api_key'");
+			Logger.info("GCM API KEY is null -- no push notifications will be sent to google.");
+		}
+
+		if (gcmApiKey == null && appleCert == null) { 
+			Logger.error("No push notification extension providers configured!");
 		}
 		
 		this.appleCert = appleCert;
