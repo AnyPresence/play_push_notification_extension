@@ -42,7 +42,7 @@ public class LifecycleTriggeredPushNotification implements Runnable
 			}
 		
 			try {
-				JsonNode alertNode = Json.parse(alert);
+				JsonNode alertNode = Json.parse("\"" + alert + "\"");
 				JsonNode messagePayloadNode = Json.parse(messagePayload);
 				
 				channel.publish(badge, alertNode, messagePayloadNode, isProd);
