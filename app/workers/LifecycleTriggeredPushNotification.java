@@ -41,13 +41,25 @@ public class LifecycleTriggeredPushNotification implements Runnable
 				badge = 0;
 			}
 		
+			JsonNode alertNode = null;
+			JsonNode messagePayloadNode = null;
+
 			try {
-				JsonNode alertNode = Json.parse("\"" + alert + "\"");
-				JsonNode messagePayloadNode = Json.parse(messagePayload);
-				
+				alertNode = Json.parse("\"" + alert + "\"");
+			} catch(Exception e) { 
+				Logger.warn("alert " + alert + " could not be parsed to a valid JSON string : " + e.getMessage());
+			}
+
+			try {
+				messagePayloadNode = Json.parse(messagePayload);
+			} catch(Exception e) { 
+				Logger.warn("message payload " + messagePayload + " could not be parsed to a valid JSON node : " + e.getMessage());
+			}
+
+			try {
 				channel.publish(badge, alertNode, messagePayloadNode, isProd);
 			} catch(Exception e) {
-				Logger.error("Couldn't send push notification because alert or message payload could not be parsed to a valid JSON node. \n  alert : " + alert + "\n  messagePayload : " + messagePayload);
+				Logger.error("Couldn't send push notification because alert or message payload could not be parsed to a valid JSON node. \n  alert : " + alert + "\n  messagePayload : " + messagePayload, e);
 			}
 			
 		} else {
