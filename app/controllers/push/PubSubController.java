@@ -37,10 +37,10 @@ public class PubSubController extends Controller {
 			return ResponseBuilder.badRequestJsonResponse(false, "no json provided in request body");
 		} else {
 			JsonNode channelName = json.get("channel");
-			JsonNode deviceToken = json.get("device_token");
+			JsonNode deviceToken = json.get("deviceToken");
 
 			if (channelName == null || deviceToken == null) {
-				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel and device_token parameters");
+				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel and deviceToken parameters");
 			} else {
 				String channelStr = channelName.asText();
 				String deviceTokenStr = deviceToken.asText();
@@ -49,7 +49,7 @@ public class PubSubController extends Controller {
 
 				if (channelStr == null || channelStr.isEmpty()
 						|| deviceTokenStr == null || deviceTokenStr.isEmpty()) {
-					return ResponseBuilder.badRequestJsonResponse(false, "must provide valid channel and device_token parameters");
+					return ResponseBuilder.badRequestJsonResponse(false, "must provide valid channel and deviceToken parameters");
 				} else {
 					Logger.debug("Received subscription request for channel "
 							+ channelStr + " and device token "
@@ -106,10 +106,10 @@ public class PubSubController extends Controller {
 			return ResponseBuilder.badRequestJsonResponse(false, "no json provided in request body");
 		} else {
 			JsonNode channelName = json.get("channel");
-			JsonNode deviceToken = json.get("device_token");
+			JsonNode deviceToken = json.get("deviceToken");
 
 			if (channelName == null || deviceToken == null) {
-				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel and device_token parameters");
+				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel and deviceToken parameters");
 			} else {
 				String channelStr = channelName.asText();
 				String deviceTokenStr = deviceToken.asText();
@@ -120,7 +120,7 @@ public class PubSubController extends Controller {
 				
 				if (channelStr == null || channelStr.isEmpty()
 						|| deviceTokenStr == null || deviceTokenStr.isEmpty()) {
-					return ResponseBuilder.badRequestJsonResponse(false, "must provide valid channel and device_token parameters");
+					return ResponseBuilder.badRequestJsonResponse(false, "must provide valid channel and deviceToken parameters");
 				} else {
 					Device device = Device.findByTokenAndType(deviceTokenStr, deviceType);
 					if (device == null) { 
@@ -162,17 +162,17 @@ public class PubSubController extends Controller {
 			JsonNode channelName = json.get("channel");
 			JsonNode badge = json.get("badge");
 			JsonNode alert = json.get("alert");
-			JsonNode messagePayload = json.get("message_payload");
+			JsonNode messagePayload = json.get("messagePayload");
 			Logger.info("Serialized : " + messagePayload.toString());
 
 			if (channelName == null || badge == null || alert == null || messagePayload == null)  {
-				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel, badge, alert, and message_payload parameters");
+				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel, badge, alert, and messagePayload parameters");
 			} else {
 				String channelStr = channelName.asText();
 				Integer badgeInt = badge == null ? null : badge.asInt();
 				
 				if (channelStr.trim().isEmpty()) {
-					return ResponseBuilder.badRequestJsonResponse(false, "must provide values for channel, badge, alert, and message_payload parameters");
+					return ResponseBuilder.badRequestJsonResponse(false, "must provide values for channel, badge, alert, and messagePayload parameters");
 				} else {
 					Channel channel = Channel.findByName(channelStr);
 					if (channel == null) { 
