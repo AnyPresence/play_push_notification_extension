@@ -1,6 +1,5 @@
 package models.push.provider;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -25,18 +24,18 @@ import play.Logger;
 
 public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsPushNotification> {
 
-	private File apnsKeystoreFile;
+	private byte[] apnsKeystore;
 	private String apnsKeystorePassword;
 	
-	public ApnsPushNotificationProvider(File apnsKeystoreFile, String apnsKeystorePassword) {
-		this.apnsKeystoreFile = apnsKeystoreFile;
+	public ApnsPushNotificationProvider(byte[] apnsKeystore, String apnsKeystorePassword) {
+		this.apnsKeystore = apnsKeystore;
 		this.apnsKeystorePassword = apnsKeystorePassword;
 	}
 	
 	@Override
 	protected void pushIt(ApnsPushNotification pushNotification) {
 
-		if (apnsKeystoreFile == null) { 
+		if (apnsKeystore == null) { 
 			Logger.info("Can't push to apple because keystore file has not been configured -- push to apple will be skipped");
 			return;
 		}		
@@ -90,7 +89,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 			Logger.info("APNS JSON String : " + writer.toString());
 			PushNotificationPayload payload = new PushNotificationPayload(writer.toString());
 			boolean prod = pushNotification.isPushToProd();
-			PushedNotifications notifications = Push.payload(payload, apnsKeystoreFile, apnsKeystorePassword, prod, appleDeviceTokens.toArray(new String[appleDeviceTokens.size()]));
+			PushedNotifications notifications = Push.payload(payload, apnsKeystore, apnsKeystorePassword, prod, appleDeviceTokens.toArray(new String[appleDeviceTokens.size()]));
 			Logger.info("Successful push count : " + notifications.getSuccessfulNotifications().size());
 			Logger.info("Failed push count : " + notifications.getFailedNotifications().size());
 		} catch(IOException e) {
@@ -98,7 +97,7 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 		} catch(JSONException e) {
 			throw new PushNotificationException("Encountered JSONException : " + e.getMessage() + ", for message payload " + messagePayload.toString(), e, "Message payload is not valid JSON");
 		} catch(KeystoreException e) { 
-			throw new PushNotificationException("Encountered KeystoreException : " + e.getMessage() + ", for message keystore " + apnsKeystoreFile.getAbsolutePath(), e, "Application security settings not configured correctly");
+			throw new PushNotificationException("Encountered KeystoreException : " + e.getMessage(), e, "Application security settings not configured correctly");
 		} catch (CommunicationException e) {
 			throw new PushNotificationException("Encountered CommunicationException : " + e.getMessage(), e, "Unable to communicate with Apple");
 		} catch(Exception e) {

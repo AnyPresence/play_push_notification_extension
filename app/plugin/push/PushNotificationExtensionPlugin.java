@@ -1,10 +1,17 @@
 package plugin.push;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +25,7 @@ public class PushNotificationExtensionPlugin extends Plugin {
 	private Application app;
 	private String gcmUrl;
 	private String gcmApiKey;
-	private File appleCert;
+	private byte[] appleCert;
 	private String appleCertPassword;
 	
 	public PushNotificationExtensionPlugin(Application app) { 
@@ -36,33 +43,50 @@ public class PushNotificationExtensionPlugin extends Plugin {
 		
 		String appleCertFile = PushNotificationConstants.APPLE_CERT;
 
-		File appleCert = null;
+		InputStream appleCert = null;
 		
 		if (appleCertFile == null) { 
 			Logger.info("No apple cert file defined.  No push notifications will be sent to Apple");
 		} else {
-			appleCert = Play.application().getFile(appleCertFile);
-	                if (!appleCert.exists()) {
-        	                throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- apple cert file " + appleCert.getAbsolutePath() + " was not found!  Should be relative to the root of the play application");
-                	}
-		
-			BufferedReader reader = null;
-			try {
-				reader = new BufferedReader(new FileReader(appleCert));
-				String line = null;
-				Pattern pattern = Pattern.compile("Apple Development IOS Push Services");
-				boolean match = false;
-				while ((line = reader.readLine()) != null && !match) { 
-					Matcher m = pattern.matcher(line);
-					match = m.find();
+
+			File appleCertFileObj = Play.application().getFile(appleCertFile);
+
+	                if (!appleCertFileObj.exists()) {
+				// the cert file doesn't exist ... let's check to see if it is available inside
+				// the bundled artifact -- this happens if we're deployed inside a WAR file
+
+				String conflessFilePath = appleCertFile;
+				if (appleCertFile.startsWith("conf/")) {
+					conflessFilePath = appleCertFile.substring(5);	
 				}
-			} catch(FileNotFoundException e) { 
-				throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because file " + appleCert.getAbsolutePath() + " could not be read, due to FileNotFoundException", e);
-			} catch(IOException e) { 
-				throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because file " + appleCert.getAbsolutePath() + " could not be read, due to IOException", e);
-			} finally {
-				try { if (reader != null) { reader.close(); } } catch(IOException e) { } // don't care about exc on close
+
+				appleCert = Play.application().resourceAsStream("/" + conflessFilePath);
+				if (appleCert == null) {
+					throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- apple cert file " + appleCertFile + " was not found!  Should be relative to the root of the play application (or if running in a war file, included in the war at the specified location");
+				}
+			} else {
+				try {
+					appleCert = new FileInputStream(appleCertFileObj);
+				} catch(FileNotFoundException e) {
+					throw new RuntimeException("Failed to start PushNotificationExtensionPlugin -- received file not found exception for file " + appleCertFileObj.getAbsolutePath(), e);
+				}
 			}
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			InputStream is = null;
+			try {
+				is = new BufferedInputStream(appleCert);
+				int i = 0;
+				while ((i = is.read()) != -1) {
+					baos.write(i);
+				}
+			} catch(IOException e) { 
+				throw new RuntimeException("Failed to start PushNotificationExtensionPlugin because certificate could not be read, due to IOException", e);
+			} finally {
+				try { if (is != null) { is.close(); } } catch(IOException e) { } // don't care about exc on close
+				try { baos.close(); } catch(IOException e) { } // don't care -- this doesn't happen for ByteArrayOutputStream
+			}
+			this.appleCert = baos.toByteArray();
 
 		}
 		
@@ -83,7 +107,6 @@ public class PushNotificationExtensionPlugin extends Plugin {
 			Logger.error("No push notification extension providers configured!");
 		}
 		
-		this.appleCert = appleCert;
 		this.appleCertPassword = appleCertPassword;
 		this.gcmUrl = gcmUrl;
 		this.gcmApiKey = gcmApiKey;
@@ -94,7 +117,7 @@ public class PushNotificationExtensionPlugin extends Plugin {
 		return Play.application().plugin(PushNotificationExtensionPlugin.class);
 	}
 	
-	public File getAppleCert() {
+	public byte[] getAppleCert() {
 		return appleCert;
 	}
 	
