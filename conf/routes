@@ -1,0 +1,10 @@
+# Please note that this route definition file is
+# only used for testing.  A play application can
+# only have a single routes file defined, so this
+# one is not used when the application is packaged.
+# It is up to the application that includes this 
+# library to correctly define the routes.  This
+# file can be used as a sample for configuring the
+# routes for the extension
+
+POST    /push/subscribe    controllers.push.PubSubController.subscribe()
