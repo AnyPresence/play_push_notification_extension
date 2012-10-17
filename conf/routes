@@ -8,3 +8,5 @@
 # routes for the extension
 
 POST    /push/subscribe    controllers.push.PubSubController.subscribe()
+POST    /push/unsubscribe  controllers.push.PubSubController.unsubscribe()
+POST    /push/publish      controllers.push.PubSubController.publish()

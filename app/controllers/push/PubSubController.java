@@ -41,6 +41,10 @@ public class PubSubController extends Controller {
 
 			if (channelName == null || deviceToken == null) {
 				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel and deviceToken parameters");
+			} else if (!channelName.isTextual()) {
+				return ResponseBuilder.badRequestJsonResponse(false, "channel must be a string");
+			} else if (!deviceToken.isTextual()) {
+				return ResponseBuilder.badRequestJsonResponse(false, "deviceToken must be a string");
 			} else {
 				String channelStr = channelName.asText();
 				String deviceTokenStr = deviceToken.asText();
@@ -110,6 +114,10 @@ public class PubSubController extends Controller {
 
 			if (channelName == null || deviceToken == null) {
 				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel and deviceToken parameters");
+			} else if (!channelName.isTextual()) {
+				return ResponseBuilder.badRequestJsonResponse(false, "channel must be a string");
+			} else if (!deviceToken.isTextual()) {
+				return ResponseBuilder.badRequestJsonResponse(false, "deviceToken must be a string");
 			} else {
 				String channelStr = channelName.asText();
 				String deviceTokenStr = deviceToken.asText();
@@ -163,13 +171,30 @@ public class PubSubController extends Controller {
 			JsonNode badge = json.get("badge");
 			JsonNode alert = json.get("alert");
 			JsonNode messagePayload = json.get("messagePayload");
-			Logger.info("Serialized : " + messagePayload.toString());
 
-			if (channelName == null || badge == null || alert == null || messagePayload == null)  {
-				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel, badge, alert, and messagePayload parameters");
+			if (channelName == null || alert == null || messagePayload == null)  {
+				return ResponseBuilder.badRequestJsonResponse(false, "must provide channel, alert, and messagePayload parameters");
+			} else if(!channelName.isTextual()) {
+				return ResponseBuilder.badRequestJsonResponse(false, "channel must be a string!");
+			} else if (!alert.isTextual()) { 
+				return ResponseBuilder.badRequestJsonResponse(false, "alert must be a string!");
+			} else if (!messagePayload.isObject()) {
+				return ResponseBuilder.badRequestJsonResponse(false, "messagePayload must be valid json object");
 			} else {
+				Logger.debug("Serialized messagePayload : " + messagePayload.toString());
 				String channelStr = channelName.asText();
-				Integer badgeInt = badge == null ? null : badge.asInt();
+				if (channelStr == null) { 
+					return ResponseBuilder.badRequestJsonResponse(false, "channel must be a string");
+				}
+				
+				Integer badgeInt = null;
+				if (badge != null) {
+					if (!badge.isInt()) {
+						return ResponseBuilder.badRequestJsonResponse(false, "badge, if provided, must be a valid integer");
+					} else {
+						badgeInt = badge.asInt();
+					}
+				}
 				
 				if (channelStr.trim().isEmpty()) {
 					return ResponseBuilder.badRequestJsonResponse(false, "must provide values for channel, badge, alert, and messagePayload parameters");
