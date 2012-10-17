@@ -12,29 +12,27 @@ import play.test.TestServer;
 
 public class PubSubControllerTest {
 	
-	  private static final int PORT = 3333;
-	  private static final String TEST_SERVER_URL = "http://localhost:" + PORT;
-	  
+	private static final int PORT = 3333;
+	private static final String TEST_SERVER_URL = "http://localhost:" + PORT;
 
-	  @Test
-	  public void testSubscribe() {
+	@Test
+	public void testSubscribe() {
 		  
-		  TestServer ts = testServer(PORT);
+		TestServer ts = testServer(PORT);
 		  
-		  running(ts, new Runnable() {
-		      public void run() {
-		         assertThat(
-		           WS.url(TEST_SERVER_URL + "/push/subscribe")
-		             .setHeader("User-Agent", "iPhone")
-		             .setHeader("Content-Type", "application/json")
-		          	 .post("{ \"channel\" : \"my_channel\" , \"deviceToken\" : \"AAA\" }").get().getStatus()
-			).isEqualTo(OK);
-		      }
-		  });
-
+		running(ts, new Runnable() {
+			public void run() {
+				assertThat(
+						WS.url(TEST_SERVER_URL + "/push/subscribe")
+							.setHeader("User-Agent", "iPhone")
+							.setHeader("Content-Type", "application/json")
+							.post("{ \"channel\" : \"my_channel\" , \"deviceToken\" : \"AAA\" }")
+							.get()
+							.getStatus()
+				).isEqualTo(OK);
+			}
+		});
 	  
-	  }
-	  
-	  
+	}
 	
 }
