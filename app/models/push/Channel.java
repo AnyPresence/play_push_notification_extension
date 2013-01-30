@@ -26,7 +26,7 @@ import com.google.code.morphia.annotations.Reference;
 @Entity(value = "channels")
 public class Channel extends BaseEntity {
 
-	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
+	private static final Datastore DS = play.Play.application().plugin(MorphiaBootstrapPlugin.class).getDatastore();
 	static { DS.ensureIndex(Channel.class, "channels_name_index", "name", true, false); }
 
 	@Id

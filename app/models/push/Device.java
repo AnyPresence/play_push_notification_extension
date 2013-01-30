@@ -21,7 +21,7 @@ import com.mongodb.WriteResult;
 @Entity(value = "devices")
 public class Device extends BaseEntity {
 
-	private static final Datastore DS = MorphiaBootstrapPlugin.getPlugin().getDatastore();
+	private static final Datastore DS = play.Play.application().plugin(MorphiaBootstrapPlugin.class).getDatastore();
 	static { DS.ensureIndex(Device.class, "devices_token_type_index", "token, type", true, false); }
 
 	@Id

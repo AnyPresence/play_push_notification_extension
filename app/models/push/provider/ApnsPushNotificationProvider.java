@@ -10,7 +10,9 @@ import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
 import javapns.communication.exceptions.KeystoreException;
 import javapns.notification.PushNotificationPayload;
+import javapns.notification.PushedNotification;
 import javapns.notification.PushedNotifications;
+import javapns.notification.ResponsePacket;
 import models.push.notification.ApnsPushNotification;
 import models.push.notification.PushNotification;
 
@@ -92,6 +94,18 @@ public class ApnsPushNotificationProvider extends PushNotificationProvider<ApnsP
 			PushedNotifications notifications = Push.payload(payload, apnsKeystore, apnsKeystorePassword, prod, appleDeviceTokens.toArray(new String[appleDeviceTokens.size()]));
 			Logger.info("Successful push count : " + notifications.getSuccessfulNotifications().size());
 			Logger.info("Failed push count : " + notifications.getFailedNotifications().size());
+
+			for (PushedNotification push : notifications.getFailedNotifications()) {
+				Exception pushException = push.getException();
+				if (pushException != null) { 
+					Logger.info("Received exception on push! " + pushException.getMessage(), pushException);
+					//throw new PushNotificationException("Received exception: " + pushException.getMessage(), pushException);
+				}
+				ResponsePacket packet = push.getResponse();
+				if (packet != null && packet.getMessage() != null) { 
+					Logger.info("Response from Apple on failed notification : " + packet.getMessage());
+				}
+			}
 		} catch(IOException e) {
 			throw new PushNotificationException("Encountered IOException : " + e.getMessage() + ", for message payload " + messagePayload.toString(), e, "Unable to parse message payload into JSON");
 		} catch(JSONException e) {

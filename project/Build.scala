@@ -1,10 +1,10 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import java.io.File
 import java.util.Date
 import play.core._
-import play.core.Router.RoutesCompiler
+import play.router.RoutesCompiler
 
 object ApplicationBuild extends Build {
 
@@ -12,13 +12,14 @@ object ApplicationBuild extends Build {
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
-      "com.anypresence.play" % "morphia-bootstrap_2.9.1" % "1.0-SNAPSHOT",
+      "com.anypresence.play" % "morphia-bootstrap_2.10" % "1.0-SNAPSHOT",
       "com.google.code.morphia"    % "morphia"               % "1.00-SNAPSHOT",
       "com.google.code.morphia"    % "morphia-logging-slf4j" % "0.99",
-      "com.google.code.morphia"    % "morphia-validation"    % "0.99" 
+      "com.google.code.morphia"    % "morphia-validation"    % "0.99",
+      javaCore 
     )
 
-    val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
+    val main = play.Project(appName, appVersion, appDependencies).settings(
       // Add your own project settings here      
       resolvers ++= Seq("Morphia" at "http://morphia.googlecode.com/svn/mavenrepo/"): _*).settings(
         // Ensure that the application.conf and routes files are not included in the compiled jar file
