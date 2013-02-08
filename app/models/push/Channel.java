@@ -26,8 +26,7 @@ import com.google.code.morphia.annotations.Reference;
 @Entity(value = "channels")
 public class Channel extends BaseEntity {
 
-	private static final Datastore DS = play.Play.application().plugin(MorphiaBootstrapPlugin.class).getDatastore();
-	static { DS.ensureIndex(Channel.class, "channels_name_index", "name", true, false); }
+	static { datastore().ensureIndex(Channel.class, "channels_name_index", "name", true, false); }
 
 	@Id
 	public ObjectId id;
@@ -43,18 +42,22 @@ public class Channel extends BaseEntity {
 		this.name = name;
 	}
 
+	private static Datastore datastore() {
+		return play.Play.application().plugin(MorphiaBootstrapPlugin.class).getDatastore();
+	}
+
 	public static void create(Channel channel) {
-		Key<Channel> key = DS.save(channel);
+		Key<Channel> key = datastore().save(channel);
 		channel.id = (ObjectId) key.getId();
 		Logger.info("Saved new instance of channel : " + channel);		
 	}
 
 	public static void update(Channel channel) {
-		DS.save(channel);
+		datastore().save(channel);
 	}
 
 	public static Channel findByName(String name) {
-		return DS.createQuery(Channel.class).filter("name", name).get();
+		return datastore().createQuery(Channel.class).filter("name", name).get();
 	}
 	
 	private Map<DeviceType, List<String>> sortDeviceIds(Set<Device> devices) {

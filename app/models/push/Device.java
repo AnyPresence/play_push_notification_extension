@@ -21,8 +21,7 @@ import com.mongodb.WriteResult;
 @Entity(value = "devices")
 public class Device extends BaseEntity {
 
-	private static final Datastore DS = play.Play.application().plugin(MorphiaBootstrapPlugin.class).getDatastore();
-	static { DS.ensureIndex(Device.class, "devices_token_type_index", "token, type", true, false); }
+	static { datastore().ensureIndex(Device.class, "devices_token_type_index", "token, type", true, false); }
 
 	@Id
 	public ObjectId id;
@@ -39,24 +38,28 @@ public class Device extends BaseEntity {
 		this.token = token;
 		this.type = type;
 	}
+	
+	private static Datastore datastore() { 
+		return play.Play.application().plugin(MorphiaBootstrapPlugin.class).getDatastore();
+	}
 
 	public static void create(Device device) {
-		Key<Device> deviceKey = DS.save(device);
+		Key<Device> deviceKey = datastore().save(device);
 		device.id = (ObjectId) deviceKey.getId();
 		Logger.debug("Created device with key " + deviceKey.getId());
 	}
 
 	public static boolean delete(Device device) {
-		WriteResult res = DS.delete(device);
+		WriteResult res = datastore().delete(device);
 		return res.getN() == 1;
 	}
 
 	public static Device findByTokenAndType(String token, DeviceType type) {
-		return DS.createQuery(Device.class).filter("token", scrubToken(token)).filter("type", type.toString()).get();
+		return datastore().createQuery(Device.class).filter("token", scrubToken(token)).filter("type", type.toString()).get();
 	}
 	
 	public static void update(Device device) {
-		DS.save(device);
+		datastore().save(device);
 	}
 
 	@PreSave
