@@ -1,4 +1,4 @@
-package models.push
+package push.models
 
 import com.mongodb.casbah.Imports._
 import com.novus.salat._
@@ -6,10 +6,10 @@ import com.novus.salat.annotations._
 import com.novus.salat.dao._
 import com.novus.salat.global._
 import java.util.Date
-import models.push.notifier.PushNotificationException
 import play.api.Play.current
 import play.api.Logger._
 import play.api.libs.json.{JsObject, JsValue}
+import push.models.notifier.PushNotificationException
 import mongoContext._
 import se.radley.plugin.salat._
 import scala.collection.Set

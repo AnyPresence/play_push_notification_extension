@@ -1,6 +1,5 @@
-package controllers.push
+package push.controllers
 
-import models.push.DeviceType
 import play.api.Logger._
 import play.api.http.HeaderNames._
 import play.api.libs.iteratee.Done
@@ -10,6 +9,7 @@ import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import play.api.mvc.Results._
+import push.models.DeviceType
 
 object Functions {
   

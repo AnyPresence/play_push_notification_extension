@@ -1,4 +1,4 @@
-package models.push.notifier
+package push.models.notifier
 
 import java.io.{ BufferedInputStream, FileInputStream }
 

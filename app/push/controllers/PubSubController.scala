@@ -1,9 +1,6 @@
-package controllers.push
+package push.controllers
 
 import Functions._
-import models.push.Channel
-import models.push.Device
-import models.push.DeviceType
 import play.api.Logger._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -11,6 +8,9 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Request
 import play.api.mvc.Results._
+import push.models.Channel
+import push.models.Device
+import push.models.DeviceType
 
 object PubSubController extends Controller {
 

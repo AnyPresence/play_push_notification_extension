@@ -1,4 +1,4 @@
-package models.push
+package push.models
 
 import com.novus.salat.dao._
 import com.novus.salat.annotations._

@@ -1,4 +1,4 @@
-package models.push
+package push.models
 
 import notifier.Notifiers._
 
