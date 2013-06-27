@@ -23,12 +23,12 @@ object Notifiers {
   type Notifier = { def notify(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject, deviceTokens: Set[String]): Unit }
 
   def apnsKeystore: Array[Byte] = {
-    val filename = sys.env.get("APNS_KEYSTORE").getOrElse{ throw new RuntimeException("APNS_KEYSTORE env variable not defined") }
+    val filename = current.configuration.getString("apple_cert").getOrElse{ throw new RuntimeException("Application config key apple_cert must be defined!") }
     scala.io.Source.fromFile(filename)(scala.io.Codec.ISO8859).map(_.toByte).toArray
   }
   
   def apnsPassword: String = {
-    sys.env.get("APNS_KEYSTORE_PASSWORD").getOrElse { throw new RuntimeException("APNS_KEYSTORE_PASSWORD env variable not defined") }
+    current.configuration.getString("apple_cert_password").getOrElse { throw new RuntimeException("APNS_KEYSTORE_PASSWORD env variable not defined") }
   }
 
   object ApnsNotifier {
