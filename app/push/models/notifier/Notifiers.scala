@@ -33,11 +33,12 @@ object Notifiers {
 
   object ApnsNotifier {
     
-    def notify(badgeMaybe: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject, deviceTokens: Set[String]) = {
+    def notify(badgeMaybe: Option[Int], alert: JsValue, soundMaybe: Option[String], messagePayload: JsObject, deviceTokens: Set[String]) = {
       try {
         info("ApnsNotifier notifying " + deviceTokens + " of event")
         val lb = ListBuffer[Tuple2[String, JsValueWrapper]]()
         badgeMaybe.map { badge => lb.append("badge" -> JsNumber(badge)) }
+        soundMaybe.map { sound => lb.append("sound" -> sound) }
         lb.append("alert" -> alert)
       
         val jsObj = Json.obj( "aps" -> (Json.obj(lb.toSeq:_*) ++ messagePayload))
