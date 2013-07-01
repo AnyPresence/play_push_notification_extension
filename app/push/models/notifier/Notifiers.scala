@@ -46,7 +46,7 @@ object Notifiers {
         debug("Sending the following packet to apple : " + jsObj.toString())
     
         val payload = new PushNotificationPayload(jsObj.toString())
-        val notifications = Push.payload(payload, keystore, password, current.mode == Mode.Prod, deviceTokens.toArray)
+        val notifications = Push.payload(payload, keystore, password, current.configuration.getBoolean("apple_cert_is_apns_dev_cert"), deviceTokens.toArray)
         info("Successful push count : " + notifications.getSuccessfulNotifications().size())
         info("Failed push count : " + notifications.getFailedNotifications().size())
       
