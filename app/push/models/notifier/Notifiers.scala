@@ -23,12 +23,20 @@ object Notifiers {
   type Notifier = { def notify(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject, deviceTokens: Set[String]): Unit }
 
   def apnsKeystore: Array[Byte] = {
-    val filename = current.configuration.getString("apple_cert").getOrElse{ throw new RuntimeException("Application config key apple_cert must be defined!") }
+    val filename = current.configuration.getString("apple_cert").getOrElse{ throw new RuntimeException("apple_cert in extensions.conf not defined") }
     scala.io.Source.fromFile(filename)(scala.io.Codec.ISO8859).map(_.toByte).toArray
   }
   
   def apnsPassword: String = {
-    current.configuration.getString("apple_cert_password").getOrElse { throw new RuntimeException("APNS_KEYSTORE_PASSWORD env variable not defined") }
+    current.configuration.getString("apple_cert_password").getOrElse { throw new RuntimeException("apple_cert_password in extensions.conf not defined") }
+  }
+
+  def gcmApiKey: String = {
+    current.configuration.getString("gcm_api_key").getOrElse { throw new RuntimeException("gcm_api_key in extensions.conf not defined") }
+  }
+  
+  def gcmApiUrl: String = {
+    current.configuration.getString("gcm_url").getOrElse("https://android.googleapis.com/gcm/send")
   }
 
   object ApnsNotifier {
@@ -73,9 +81,42 @@ object Notifiers {
   }
 
   object GcmNotifier {
-    def notify(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject, deviceTokens: Set[String]) = {
-      info("Dummy implementation of GcmNotifier does nothing ... need to implement!")
+    
+    import play.api.libs.ws.WS
+    import play.api.http.HeaderNames._
+    import play.api.http.Status._
+    import scala.concurrent.ExecutionContext.Implicits.global
+    
+    def notify(badgeMaybe: Option[Int], alert: JsValue, soundMaybe: Option[String], messagePayload: JsObject, deviceTokens: Set[String]) = {
+      try {
+        info("GcmNotifier notifying " + deviceTokens + " of event")
+        val lb = ListBuffer[Tuple2[String, JsValueWrapper]]()
+        lb.append("data" -> messagePayload)
+        badgeMaybe.map { badge => lb.append("badge" -> JsNumber(badge)) }
+        val jsObj = Json.obj("registration_ids" -> deviceTokens, "data" -> (Json.obj(lb.toSeq:_*)))
+        debug("Sending the following packet to google : " + jsObj.toString())
+        val key = "key=" + apiKey
+        val responseFuture = WS.url(gcmUrl).withHeaders(CONTENT_TYPE -> "application/json", "Authorization" -> key).post(jsObj.toString())
+        val resultFuture = responseFuture.map { response => 
+          response.status match {
+            case OK => {
+              debug("OK Response received from Google for push notification")
+              Some(response.json)
+            }
+            case _ => {
+              error("Unable to send push notification to google.  Response status received was " + response.status + ", with body: " + response.body)
+              None
+            }
+          }
+        }
+      } catch {
+        case e: Exception => throw new PushNotificationException("Encountered unexpected error : " + e.getMessage(), e, "An unexpected error occurred")
+      }
     }
+    
+    lazy val apiKey = gcmApiKey
+    lazy val gcmUrl = gcmApiUrl
+    
   }
 
 }
