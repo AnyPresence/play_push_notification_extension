@@ -19,14 +19,14 @@ object PubSubController extends Controller {
   
   private val subscriptionReads = (
     (__ \ 'channel).read[String] and
-    (__ \ 'deviceToken).read[String])(SubscribeRequest)
+    (__ \ 'device_token).read[String])(SubscribeRequest)
     
   private val publishReads = (
     (__ \ 'channel).read[String] and
     (__ \ 'badge).readNullable[Int] and
     (__ \ 'alert).read[JsValue] and 
     (__ \ 'sound).readNullable[String] and
-    (__ \ 'messagePayload).read[JsObject])(PublishRequest)
+    (__ \ 'message_payload).read[JsObject])(PublishRequest)
   
   private def badRequest(errorMessage: String) = {
     BadRequest(Json.obj("success" -> false, "error" -> errorMessage))
