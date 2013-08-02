@@ -2,6 +2,8 @@ package push.controllers
 
 import Functions._
 import play.api.Logger._
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc.Action
@@ -17,9 +19,12 @@ object PubSubController extends Controller {
   case class SubscribeRequest(channel: String, deviceToken: String)
   case class PublishRequest(channel: String, badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject)
   
-  private val subscriptionReads = (
-    (__ \ 'channel).read[String] and
-    (__ \ 'device_token).read[String])(SubscribeRequest)
+  val subscriptionForm = Form(
+    tuple(
+      "channel" -> nonEmptyText,
+      "device_token" -> nonEmptyText
+    )
+  )
     
   private val publishReads = (
     (__ \ 'channel).read[String] and
@@ -41,57 +46,71 @@ object PubSubController extends Controller {
   }
   
   def subscribe = {
-    implicit val reads = subscriptionReads
     DeviceTypeAware { deviceType : DeviceType.Value =>
-      Action(parse.json) { implicit request: Request[JsValue] =>
+      Action { implicit request: Request[_] =>
         debug("Received subscribe request") 
-        Json.fromJson(request.body).map { req: SubscribeRequest =>
-          Device.findByTokenAndType(req.deviceToken, deviceType).orElse {
-            val newDevice = Device(id = null, token = req.deviceToken, deviceType = deviceType)
-            debug("Device not found, so attempting to create it : " + newDevice)
-            Device.create(newDevice)
-          }.map { device: Device =>
-            Channel.findByName(req.channel).orElse {
-              val newChannel = Channel(id = null, name = req.channel)
-              debug("Channel not found, so attempting to create it : " + newChannel)              
-              Channel.create(newChannel)
-            }.map { channel: Channel =>
-              if (Channel.update(channel.copy(devices = channel.devices + device.id))) {
-                debug("Channel updated successfully " + channel)
-                if (Device.update(device.copy(channels = device.channels + channel.id))) {
-                  debug("Device updated successfully " + device)
-                  ok()
-                } else {
-                  ok(false, Some("Unable to subscribe device to channel"))
-                }
-              } else {
-                ok(false, Some("Unable to subscribe device to channel"))
-              }
-            }.getOrElse(ok(false, Some("Unable to subscribe device to channel")))
-          }.getOrElse(ok(false, Some("Unable to subscribe device to channel")))
-        }.getOrElse(badRequest("Request requires both channel and deviceToken parameters"))
+        subscriptionForm.bindFromRequest.fold(
+          formWithErrors => {
+            debug("Failed to extract channel and device_token parameters from request")
+            badRequest("Unable to extract channel and device_token from request")
+          },
+          result => result match {
+            case (channel, deviceToken) => {
+              Device.findByTokenAndType(deviceToken, deviceType).orElse {
+                val newDevice = Device(id = null, token = deviceToken, deviceType = deviceType)
+                debug("Device not found, so attempting to create it : " + newDevice)
+                Device.create(newDevice)
+              }.map { device: Device =>
+                Channel.findByName(channel).orElse {
+                  val newChannel = Channel(id = null, name = channel)
+                  debug("Channel not found, so attempting to create it : " + newChannel)              
+                  Channel.create(newChannel)
+                }.map { channel: Channel =>
+                  if (Channel.update(channel.copy(devices = channel.devices + device.id))) {
+                    debug("Channel updated successfully " + channel)
+                    if (Device.update(device.copy(channels = device.channels + channel.id))) {
+                      debug("Device updated successfully " + device)
+                      ok()
+                    } else {
+                      ok(false, Some("Unable to subscribe device to channel"))
+                    }
+                  } else {
+                    ok(false, Some("Unable to subscribe device to channel"))
+                  }
+                }.getOrElse(ok(false, Some("Unable to subscribe device to channel")))
+              }.getOrElse(ok(false, Some("Unable to subscribe device to channel")))
+            }
+          }
+        )
       }
     }
   }
   
   def unsubscribe = {
-    implicit val reads = subscriptionReads
     DeviceTypeAware { deviceType : DeviceType.Value =>
-      Action(parse.json) { implicit request: Request[JsValue] =>
+      Action { implicit request: Request[_] =>
         debug("Received unsubscribe request")
-        Json.fromJson(request.body).map { req: SubscribeRequest => 
-          val deviceMaybe = Device.findByTokenAndType(req.deviceToken, deviceType)
-          val channelMaybe = Channel.findByName(req.channel) 
-          channelMaybe.map { channel =>
-            deviceMaybe.map { device =>
-              debug("Removing channel " + channel + " from device " + device)
-              Device.update(device.copy(channels = (device.channels - channel.id)))
-              debug("Removing device " + device + " from channel " + channel)
-              Channel.update(channel.copy(devices = (channel.devices - device.id)))
+        subscriptionForm.bindFromRequest.fold(
+          formWithErrors => {
+            debug("Failed to extract channel and device_token parameters from request")
+            badRequest("Unable to extract channel and device_token from request")
+          },
+          result => result match {
+            case (channel, deviceToken) => {
+              val deviceMaybe = Device.findByTokenAndType(deviceToken, deviceType)
+              val channelMaybe = Channel.findByName(channel) 
+              channelMaybe.map { channel =>
+                deviceMaybe.map { device =>
+                  debug("Removing channel " + channel + " from device " + device)
+                  Device.update(device.copy(channels = (device.channels - channel.id)))
+                  debug("Removing device " + device + " from channel " + channel)
+                  Channel.update(channel.copy(devices = (channel.devices - device.id)))
+                }
+              }
+              ok(true)
             }
           }
-          ok(true)
-        }.getOrElse(badRequest("Request requires both channel and deviceToken parameters"))
+        )
       }
     }
   }
