@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
 import play.Project._
+import com.github.hexx.GithubRepoPlugin._
 
 object ApplicationBuild extends Build {
 
@@ -15,14 +16,19 @@ object ApplicationBuild extends Build {
     "code.google.com" % "javapns" % "2.2" from "http://javapns.googlecode.com/svn/tags/2.2/JavaPNS_2.2.jar"
   )
 
-
   val main = play.Project(appName, appVersion, appDependencies).settings(
+
+    localRepo := Path.userHome / "github" / "play_api_maven_repo",
+
+    githubRepo := "git@github.com:AnyPresence/play_api_maven_repo.git",
+    
     routesImport += "se.radley.plugin.salat.Binders._", templatesImport += "org.bson.types.ObjectId",
+    
     resolvers ++= Seq( 
       "Novus Release Repository" at "http://repo.novus.com/releases/",
       "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/" 
     )
-    
-  )
+
+  ).settings(githubRepoSettings: _*)
 
 }
