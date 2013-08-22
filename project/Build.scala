@@ -9,7 +9,10 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     "se.radley" %% "play-plugins-salat" % "1.2",
-    "org.mongodb" % "mongo-java-driver" % "2.10.1" 
+    "org.mongodb" % "mongo-java-driver" % "2.10.1",
+    "log4j" % "log4j" % "1.2.15" from "http://javapns.googlecode.com/svn/tags/2.2/lib/log4j-1.2.15.jar", 
+    "bcprov" % "bcprov" % "146" from "http://javapns.googlecode.com/svn/tags/2.2/lib/bcprov-jdk15-146.jar",
+    "code.google.com" % "javapns" % "2.2" from "http://javapns.googlecode.com/svn/tags/2.2/JavaPNS_2.2.jar"
   )
 
 
