@@ -20,7 +20,7 @@ import scala.collection.JavaConversions._
 
 object Notifiers {
 
-  type Notifier = { def notify(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject, deviceTokens: Set[String]): Unit }
+  type Notifier = { def notify(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: Option[JsObject], deviceTokens: Set[String]): Unit }
 
   def apnsKeystore: Array[Byte] = {
     val filename = current.configuration.getString("apple_cert").getOrElse{ throw new RuntimeException("apple_cert in extensions.conf not defined") }
@@ -41,15 +41,19 @@ object Notifiers {
 
   object ApnsNotifier {
     
-    def notify(badgeMaybe: Option[Int], alert: JsValue, soundMaybe: Option[String], messagePayload: JsObject, deviceTokens: Set[String]) = {
+    def notify(badgeMaybe: Option[Int], alert: JsValue, soundMaybe: Option[String], messagePayloadMaybe: Option[JsObject], deviceTokens: Set[String]) = {
       try {
         info("ApnsNotifier notifying " + deviceTokens + " of event")
         val lb = ListBuffer[Tuple2[String, JsValueWrapper]]()
         badgeMaybe.map { badge => lb.append("badge" -> JsNumber(badge)) }
         soundMaybe.map { sound => lb.append("sound" -> sound) }
         lb.append("alert" -> alert)
-      
-        val jsObj = Json.obj( "aps" -> (Json.obj(lb.toSeq:_*) ++ messagePayload))
+        
+        val jsObj = messagePayloadMaybe.map { messagePayload  =>
+          Json.obj( "aps" -> (Json.obj(lb.toSeq:_*) ++ messagePayload))
+        }.getOrElse {
+          Json.obj( "aps" -> (Json.obj(lb.toSeq:_*)))
+        } 
     
         debug("Sending the following packet to apple : " + jsObj.toString())
     
@@ -87,11 +91,11 @@ object Notifiers {
     import play.api.http.Status._
     import scala.concurrent.ExecutionContext.Implicits.global
     
-    def notify(badgeMaybe: Option[Int], alert: JsValue, soundMaybe: Option[String], messagePayload: JsObject, deviceTokens: Set[String]) = {
+    def notify(badgeMaybe: Option[Int], alert: JsValue, soundMaybe: Option[String], messagePayloadMaybe: Option[JsObject], deviceTokens: Set[String]) = {
       try {
         info("GcmNotifier notifying " + deviceTokens + " of event")
         val lb = ListBuffer[Tuple2[String, JsValueWrapper]]()
-        lb.append("data" -> messagePayload)
+        messagePayloadMaybe.map { messagePayload => lb.append("data" -> messagePayload) }
         badgeMaybe.map { badge => lb.append("badge" -> JsNumber(badge)) }
         val jsObj = Json.obj("registration_ids" -> deviceTokens, "data" -> (Json.obj(lb.toSeq:_*)))
         debug("Sending the following packet to google : " + jsObj.toString())

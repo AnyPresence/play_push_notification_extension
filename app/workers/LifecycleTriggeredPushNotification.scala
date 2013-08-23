@@ -32,25 +32,25 @@ class LifecycleTriggeredPushNotification(prod: Boolean, channel: String, badge: 
       
       val alertJs: JsValue = if (alert.isEmpty) JsNull else JsString(alert)
       
-      val parsedMessagePayload: JsObject = try {
+      val parsedMessagePayloadMaybe = try {
         val payload = Json.parse(messagePayload)
         if (!payload.isInstanceOf[JsObject]) {
           warn("Unable to parse messagePayload into valid JsObject node : " + messagePayload)
-          null
+          None
         } else {
-          payload.asInstanceOf[JsObject]
+          Some(payload.asInstanceOf[JsObject])
         }
       } catch {
         case e: JsonParseException => {
           warn("Unable to parse message payload in to valid Json node : " + messagePayload + ". defaulting to null")
-          null
+          None
         }
       }
       
       val soundMaybe = if (sound.isEmpty) None else Some(sound)
       
       try {
-        Channel.publish(badgeIntMaybe, alertJs, soundMaybe, parsedMessagePayload, channel)
+        Channel.publish(badgeIntMaybe, alertJs, soundMaybe, parsedMessagePayloadMaybe, channel)
       } catch {
         case e: Exception => warn("Couldn't send push notification because an unexpected exception was encountered: " + e.getMessage(), e)
       }

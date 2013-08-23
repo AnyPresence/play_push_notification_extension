@@ -51,8 +51,8 @@ trait ChannelImpl {
     }
   }
   
-  def publish(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject, channel: Channel) : Option[String] = {
-    debug("Publish called with values badge : " + badge + ", alert : " + alert + ", sound : " +  sound + ", messagePayload : " + messagePayload.toString())
+  def publish(badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: Option[JsObject], channel: Channel) : Option[String] = {
+    debug("Publish called with values badge : " + badge + ", alert : " + alert + ", sound : " +  sound + ", messagePayload : " + messagePayload)
     val mongoObj = $or(channel.devices.map { ("_id" -> _) }.toSeq: _*)
     val results = deviceDao.dao.find(mongoObj)
     val deviceTokens = new MutableHashMap[DeviceType.Value, MutableSet[String]] with MultiMap[DeviceType.Value, String]

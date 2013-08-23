@@ -17,7 +17,7 @@ import push.models.DeviceType
 object PubSubController extends Controller {
 
   case class SubscribeRequest(channel: String, deviceToken: String)
-  case class PublishRequest(channel: String, badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: JsObject)
+  case class PublishRequest(channel: String, badge: Option[Int], alert: JsValue, sound: Option[String], messagePayload: Option[JsObject])
   
   val subscriptionForm = Form(
     tuple(
@@ -31,7 +31,7 @@ object PubSubController extends Controller {
     (__ \ 'badge).readNullable[Int] and
     (__ \ 'alert).read[JsValue] and 
     (__ \ 'sound).readNullable[String] and
-    (__ \ 'message_payload).read[JsObject])(PublishRequest)
+    (__ \ 'message_payload).readNullable[JsObject])(PublishRequest)
   
   private def badRequest(errorMessage: String) = {
     BadRequest(Json.obj("success" -> false, "error" -> errorMessage))
