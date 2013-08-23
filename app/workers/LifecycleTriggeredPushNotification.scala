@@ -33,12 +33,16 @@ class LifecycleTriggeredPushNotification(prod: Boolean, channel: String, badge: 
       val alertJs: JsValue = if (alert.isEmpty) JsNull else JsString(alert)
       
       val parsedMessagePayloadMaybe = try {
-        val payload = Json.parse(messagePayload)
-        if (!payload.isInstanceOf[JsObject]) {
-          warn("Unable to parse messagePayload into valid JsObject node : " + messagePayload)
+        if (messagePayload == null || messagePayload.isEmpty) {
           None
         } else {
-          Some(payload.asInstanceOf[JsObject])
+          val payload = Json.parse(messagePayload)
+          if (!payload.isInstanceOf[JsObject]) {
+            warn("Unable to parse messagePayload into valid JsObject node : " + messagePayload)
+            None
+          } else {
+            Some(payload.asInstanceOf[JsObject])
+          }
         }
       } catch {
         case e: JsonParseException => {
