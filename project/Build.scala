@@ -14,11 +14,11 @@ object ApplicationBuild extends Build {
     "org.mongodb" % "mongo-java-driver" % "2.10.1",
 
     // log4j and bcprov needed by javapns
-    "log4j" % "log4j" % "1.2.15" intransitive, 
-    "org.bouncycastle" % "bcprov-jdk15" % "1.46" intransitive,
+    "log4j" % "log4j" % "1.2.15", 
+    "org.bouncycastle" % "bcprov-jdk15" % "1.46",
 
     // javapns not published to mvn central or other mvn repo
-    "com.google.code" % "javapns" % "2.2" from "http://javapns.googlecode.com/svn/tags/2.2/JavaPNS_2.2.jar"
+    "com.google.code" % "javapns" % "2.2"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
@@ -30,6 +30,7 @@ object ApplicationBuild extends Build {
     routesImport += "se.radley.plugin.salat.Binders._", templatesImport += "org.bson.types.ObjectId",
     
     resolvers ++= Seq( 
+      "AnyPresence Repository" at "http://AnyPresence.github.io/play_api_maven_repo",
       "Maven Central Server" at "http://repo1.maven.org/maven2",
       "Novus Release Repository" at "http://repo.novus.com/releases/"
     )
