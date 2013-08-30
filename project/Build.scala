@@ -30,7 +30,7 @@ object ApplicationBuild extends Build {
     routesImport += "se.radley.plugin.salat.Binders._", templatesImport += "org.bson.types.ObjectId",
     
     resolvers ++= Seq( 
-      "AnyPresence Repository" at "http://AnyPresence.github.io/play_api_maven_repo",
+      "AnyPresence Repository" at "http://AnyPresence.github.io/play_api_maven_repo/snapshots",
       "Maven Central Server" at "http://repo1.maven.org/maven2",
       "Novus Release Repository" at "http://repo.novus.com/releases/"
     )
